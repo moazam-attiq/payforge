@@ -6,9 +6,9 @@ The repository contains no application code yet. Complete only the foundation mi
 
 ### Part 1 — Repository and workspace
 
-- [ ] Re-inspect the repository and preserve any user changes made after memory initialization.
+- [x] Re-inspect the repository and preserve user-created Git and pnpm root files.
 - [x] Select pnpm workspaces as the package manager/workspace approach; recorded in D007.
-- [ ] Initialize Git only if the user requests it or repository policy clearly authorizes it.
+- [x] Initialize Git; completed manually by the user. GitHub remote linking remains user-managed.
 - [ ] Create `apps/api` as a NestJS TypeScript application.
 - [ ] Create `apps/dashboard` as a React/Vite TypeScript application.
 - [ ] Create only the shared packages needed for contracts/test fixtures; avoid speculative abstractions.

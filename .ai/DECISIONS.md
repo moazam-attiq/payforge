@@ -81,3 +81,13 @@ This file is append-only. Never delete an entry. If a decision changes, mark the
 **Alternatives considered:** Stop until Docker is installed; remove Docker Compose permanently. Stopping would block unrelated foundation work, while permanent removal would conflict with the authoritative blueprint.
 
 **Consequence:** Early checks may use mocked or unavailable dependency states. PostgreSQL/Redis integration tests and Docker Compose validation remain pending until suitable services are available.
+
+## 2026-09-24 — D009: Start the API on NestJS 11
+
+**Decision:** Scaffold the API with the NestJS 11 CLI and keep the blueprint's Jest/Supertest testing direction.
+
+**Why:** The user's installed Node.js 22.13.0 satisfies the NestJS 11 foundation. The current NestJS 12 schematics require a newer Node.js 22 patch release, and the NestJS 12 default module-system path uses Vitest rather than the blueprint's explicit Jest direction.
+
+**Alternatives considered:** Upgrade Node.js immediately and use NestJS 12; use NestJS 12 with custom testing changes. Either would add an unrelated environment change or immediate scaffold churn.
+
+**Consequence:** Use `@nestjs/cli@11` for initial generation. A future major-version upgrade must be handled as an explicit dependency upgrade with passing tests, rather than happening implicitly through an unpinned generator.

@@ -2,6 +2,18 @@
 
 Entries are reverse chronological. Claims must distinguish implementation, verification, user confirmation, inference, and pending work.
 
+## 2026-09-24 — Session 3: Initialize repository and workspace root
+
+**Context:** The user authorized the AI to inspect and edit files while reserving package installation, scaffolding generators, application/service execution, migrations, and GitHub remote setup for manual execution.
+
+**What changed:** The user initialized Git and created the root pnpm manifest. Repository inspection confirmed `package.json`, `pnpm-lock.yaml`, and a root `node_modules` directory. The AI added `.gitignore`, `pnpm-workspace.yaml`, and an initial `README.md`, and updated project memory.
+
+**Verification:** Confirmed the root manifest uses `payforge`, version `0.1.0`, `private: true`, Node.js 22+, and pnpm 10.20.0. Confirmed the workspace globs cover `apps/*` and `packages/*`, and the README accurately labels the current state. Repository inspection also found that the initial commit tracks `node_modules/.pnpm-workspace-state-v1.json`; removal from the Git index is pending. No package installation, generator, build, test, or application command was run by the AI.
+
+**Not done:** NestJS and React/Vite applications, shared packages, root scripts, PostgreSQL, Redis, and Docker Compose remain pending.
+
+**Next:** The user runs the NestJS scaffolding command for `apps/api`; the AI then reviews and normalizes the generated files before dashboard scaffolding.
+
 ## 2026-09-24 — Session 2: Confirm local tools and defer Docker
 
 **Context:** The user began M0 interactively and requested command-by-command guidance while retaining control of all terminal execution.
