@@ -1,0 +1,11 @@
+{
+  "name": "payforge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "A security-conscious sandbox payment-processing platform for learning payment architecture.",
+  "scripts": {},
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@10.20.0"
+}
