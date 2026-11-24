@@ -4,7 +4,7 @@
 
 The authoritative product scope is the user-supplied `payment_gateway_engineering_blueprint.docx` reviewed in full on 2026-09-24. At that time it was located at `/Users/adroiditsolutions/Downloads/payment_gateway_engineering_blueprint.docx` and had SHA-256 `cf737aa1617a33120f65a2beed70d3f4f47a6f3bc109970e3bdde56c58182464`.
 
-The repository itself was empty when this memory system was initialized: there was no Git repository, source code, package manifest, README, configuration, test suite, or prior `.ai/` memory. Accordingly, the product requirements below are confirmed from the blueprint, while all architecture and technology descriptions are **required target state**, not claims about an existing implementation.
+The repository itself was empty when this memory system was initialized: there was no Git repository, source code, package manifest, README, configuration, test suite, or prior `.ai/` memory. The product requirements below remain confirmed from the blueprint; current implementation claims are separately labeled as verified repository state.
 
 Evidence priority for future work:
 
@@ -94,7 +94,7 @@ Development must not exceed the documented V1 scope without explicit user approv
 
 ### Verified current architecture
 
-None yet. As of 2026-09-24 the repository contains only this `.ai/` memory system. No application architecture has been implemented or verified.
+As of 2026-09-24, the repository is a pnpm workspace with a NestJS 11 API at `apps/api`, a React/Vite dashboard shell at `apps/dashboard`, and shared Zod transport schemas in `packages/contracts`. The API has validated configuration, liveness and dependency readiness endpoints, structured logging with readable development output, redaction, HTTP request correlation, a safe global error boundary, a lazy PostgreSQL/Drizzle boundary, and a lazy Redis/BullMQ configuration boundary. Empty Nest modules establish the intended V1 domain ownership boundaries but do not implement those domains. Database schemas, queues/workers, payment behavior, and real dashboard product views have not been implemented. Git is initialized and linked to a user-managed `origin` remote.
 
 ### Required target architecture
 
@@ -121,22 +121,35 @@ Transactional outbox -> BullMQ/Redis workers
 
 Keep controllers thin. Put business rules in application/domain services. Use database constraints together with domain validation for critical invariants. Make every queue worker and event handler idempotent.
 
+The current API module boundary list and ownership notes are documented in `apps/api/src/modules/README.md`. Empty module presence is architectural scaffolding only and never evidence that a feature is implemented.
+
 ## Technology stack
 
-The following stack is mandated by the blueprint but **not yet installed or implemented**:
+Verified foundation tooling and dependencies:
+
+- Node.js 22.13.0 and pnpm 10.20.0.
+- pnpm workspaces covering `apps/*` and `packages/*`.
+- NestJS 11.2.6 with Express, TypeScript 5.9.3, Jest 30, and Supertest 7.3.0 in `apps/api`.
+- React 19.3.0, Vite 8.3.0, and TypeScript 6.0.2 in `apps/dashboard`.
+- A private ESM `@payforge/contracts` workspace package using TypeScript 5.9.3 and Zod 4.6.5 for transport schemas and inferred types.
+- Pino 10.3.1 with `nestjs-pino` 5.2.0 and development-only `pino-pretty` 13.1.3.
+- Drizzle ORM 0.45.3 with node-postgres 8.23.0 and Drizzle Kit 0.31.10.
+- `@nestjs/bullmq` 11.0.5 with BullMQ 5.81.5 and ioredis 5.11.1.
+
+The following blueprint stack remains partly or wholly unimplemented:
 
 - Backend: NestJS and TypeScript.
 - Frontend: React and Vite.
-- Database: PostgreSQL.
-- Database access: Drizzle ORM with visible transaction behavior.
-- Queue/background jobs: BullMQ and Redis.
+- Database service/runtime: PostgreSQL; local service provisioning and live connectivity remain pending.
+- Database access: Drizzle ORM with an explicit lazy pool boundary; schemas, migrations, and transaction behavior remain pending.
+- Queue/background jobs: BullMQ and Redis configuration is present; live connectivity, queues, and workers remain pending.
 - Validation: Zod for API/configuration schemas and shared contracts where appropriate.
 - Authentication security: Argon2id password hashing; hashed rotated refresh tokens.
 - Logging: Pino structured JSON logging with redaction and correlation IDs.
 - Testing: Jest and Supertest.
-- Local infrastructure: Docker Compose for PostgreSQL and Redis.
+- Local infrastructure: native macOS PostgreSQL and Redis services under D015; Docker is excluded by explicit user decision.
 
-No package manager or monorepo orchestration tool has been selected in verified project files. Phase 0 must choose the smallest suitable option and record the decision before the choice becomes entrenched.
+pnpm workspaces are the selected monorepo approach under D007. No additional task runner is currently justified.
 
 ## Data and API conventions
 
@@ -157,10 +170,21 @@ No package manager or monorepo orchestration tool has been selected in verified 
 
 ```text
 PayForge/
-└── .ai/                  # persistent project memory (initialized 2026-09-24)
+├── .ai/                  # persistent project memory
+├── apps/
+│   ├── api/              # NestJS 11 API foundation
+│   └── dashboard/        # React/Vite dashboard foundation
+├── packages/
+│   └── contracts/        # shared transport schemas and types
+├── .env.example          # documented environment variable placeholders
+├── .gitignore
+├── package.json          # private pnpm workspace root
+├── pnpm-lock.yaml
+├── pnpm-workspace.yaml
+└── README.md
 ```
 
-There is no `.git/` directory and no application code yet.
+Git is initialized. A test-fixtures package has intentionally not been created because no concrete cross-package fixture use case exists yet.
 
 ### Target structure from the blueprint
 
@@ -175,9 +199,7 @@ apps/
 packages/
   contracts/
   test-fixtures/
-docker/
 docs/
-docker-compose.yml
 .env.example
 README.md
 ```
@@ -196,7 +218,7 @@ A milestone is complete only when its acceptance behavior exists and has been ve
 - no manual action is reported complete without user confirmation;
 - `.ai/ROADMAP.md`, `.ai/TASKS.md`, `.ai/PROGRESS.md`, `.ai/DECISIONS.md`, and `.ai/BLOCKERS.md` are reconciled with the result.
 
-No build or test commands exist yet. Phase 0 must create and document real scripts; future sessions must read the actual manifests and run those commands rather than inventing command names.
+The root manifest provides recursive `build`, `typecheck`, `lint`, `test`, `test:e2e`, `format:check`, and `format` commands. Future sessions must read the current manifests before running them. Service startup still requires a valid ignored root `.env`, and dependency-ready verification remains pending PostgreSQL and Redis integration.
 
 ### V1 product completion
 
@@ -206,4 +228,4 @@ V1 is done only when the merchant/auth/API-key workflow, synthetic payment lifec
 
 Never fabricate completion of an external or human-only action. Credentials and secret material, OAuth or third-party authorization, cloud-console configuration, production deployment, DNS/TLS setup, external account creation, and hardware/device testing require explicit user action or confirmation when applicable.
 
-For local development, generate only clearly documented development secrets when safe and authorized. Do not commit them. If Docker, PostgreSQL, Redis, network access, or platform permissions are unavailable, record the exact failure in `BLOCKERS.md` rather than claiming infrastructure is ready.
+For local development, generate only clearly documented development secrets when safe and authorized. Do not commit them. If PostgreSQL, Redis, network access, or platform permissions are unavailable, record the exact failure in `BLOCKERS.md` rather than claiming infrastructure is ready. Do not add Docker artifacts unless the user explicitly reverses D015.

@@ -2,17 +2,17 @@
 
 Status convention: `[ ]` not started, `[~]` in progress, `[x]` completed.
 
-No application milestone has been verified complete. The blueprint's Phase 9 and V2/V3 extensions are outside the current V1 scope and are intentionally not scheduled below.
+M0 is substantially implemented but remains open for native PostgreSQL/Redis provisioning and live dependency checks. Docker was removed by explicit user decision D015. No milestone is complete. The blueprint's Phase 9 and V2/V3 extensions are outside the current V1 scope and are intentionally not scheduled below.
 
 ## [~] M0 — Foundation
 
 **Objective:** Establish the runnable monorepo foundation without implementing payment behavior.
 
-**Major deliverables:** Workspace structure for `apps/api`, `apps/dashboard`, and appropriate shared packages; NestJS and React/Vite shells; validated configuration; PostgreSQL/Drizzle; Redis/BullMQ connectivity; Pino logging with sensitive-field redaction; request correlation; liveness/readiness checks; Docker Compose; `.env.example`; baseline Jest/Supertest setup; developer README; explicit module boundaries/interfaces for later phases.
+**Major deliverables:** Workspace structure for `apps/api`, `apps/dashboard`, and appropriate shared packages; NestJS and React/Vite shells; validated configuration; native PostgreSQL/Drizzle and Redis/BullMQ connectivity; Pino logging with sensitive-field redaction; request correlation; liveness/readiness checks; `.env.example`; baseline Jest/Supertest setup; developer README; explicit module boundaries/interfaces for later phases.
 
-**Verification:** Install/build/typecheck/lint/test scripts defined in actual manifests must pass. Health checks must be exercised with dependency-ready and dependency-unavailable cases. Logging tests must demonstrate redaction. Docker Compose configuration must be validated. Record exact commands and results in `PROGRESS.md`.
+**Verification:** Install/build/typecheck/lint/test scripts defined in actual manifests must pass. Health checks must be exercised with native dependencies ready and unavailable. Logging tests must demonstrate redaction. Record exact commands and results in `PROGRESS.md`.
 
-**Manual actions:** If the local environment cannot provide Docker or required ports, the user may need to enable/install the dependency or approve an alternative. Do not mark this necessary until verified.
+**Manual actions:** The user installs/starts native macOS PostgreSQL and Redis services and supplies local credentials where required.
 
 ## [ ] M1 — Identity and merchant security
 
@@ -96,4 +96,4 @@ No application milestone has been verified complete. The blueprint's Phase 9 and
 
 ## Current milestone
 
-**M0 — Foundation** is active. Application implementation has not started; follow `.ai/TASKS.md` and stop before payment logic.
+**M0 — Foundation** is active. The application foundation is locally verified; follow `.ai/TASKS.md` for native service setup and live readiness checks, and do not begin M1 or payment logic.

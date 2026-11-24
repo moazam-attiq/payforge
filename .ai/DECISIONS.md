@@ -44,7 +44,7 @@ This file is append-only. Never delete an entry. If a decision changes, mark the
 
 ## 2026-09-24 — D005: Adopt the blueprint's required technology direction
 
-**Decision:** Target NestJS/TypeScript, React/Vite, PostgreSQL/Drizzle, Redis/BullMQ, Zod, Argon2id, Pino, Jest/Supertest, and Docker Compose.
+**Decision:** Target NestJS/TypeScript, React/Vite, PostgreSQL/Drizzle, Redis/BullMQ, Zod, Argon2id, Pino, Jest/Supertest, and Docker Compose. The Docker Compose portion is superseded by D015; the application stack remains current.
 
 **Why:** These technologies are explicit architectural decisions in the authoritative scope and fit the required transaction, modularity, validation, observability, and worker behavior.
 
@@ -72,7 +72,7 @@ This file is append-only. Never delete an entry. If a decision changes, mark the
 
 **Consequence:** Root workspace configuration and commands should use pnpm. A task runner may be added later only when measured workflow needs justify it.
 
-## 2026-09-24 — D008: Defer Docker while establishing the application foundation
+## 2026-09-24 — D008: Defer Docker while establishing the application foundation (superseded by D015)
 
 **Decision:** Do not require Docker during initial project scaffolding. Retain Docker Compose as an M0 deliverable to add later, after the API and dashboard foundations exist.
 
@@ -91,3 +91,63 @@ This file is append-only. Never delete an entry. If a decision changes, mark the
 **Alternatives considered:** Upgrade Node.js immediately and use NestJS 12; use NestJS 12 with custom testing changes. Either would add an unrelated environment change or immediate scaffold churn.
 
 **Consequence:** Use `@nestjs/cli@11` for initial generation. A future major-version upgrade must be handled as an explicit dependency upgrade with passing tests, rather than happening implicitly through an unpinned generator.
+
+## 2026-09-24 — D010: Encode 32-byte application encryption keys as canonical base64
+
+**Decision:** Represent `APP_ENCRYPTION_KEY_V1` and `WEBHOOK_SECRET_ENCRYPTION_KEY` as canonical base64 strings that decode to exactly 32 bytes.
+
+**Why:** The blueprint requires AES-256-GCM and safely encoded 32-byte keys but does not prescribe an encoding. Canonical base64 is portable in environment variables and can be validated deterministically at startup.
+
+**Alternatives considered:** Hex encoding and arbitrary minimum-length strings. Hex is also viable but twice as long; arbitrary strings do not prove a 32-byte key.
+
+**Consequence:** Startup validation rejects malformed or incorrectly sized encryption keys. `.env.example` contains placeholders rather than usable secrets, and real values must be generated outside source control.
+
+## 2026-09-24 — D011: Pretty-print development logs while preserving production JSON
+
+**Decision:** Use `pino-pretty` only when `NODE_ENV=development`; keep raw structured JSON in production and silent logging in the test environment.
+
+**Why:** The user prefers the readable style of the original NestJS development logs, while the blueprint requires structured JSON for operational environments. Development formatting preserves Pino redaction and request correlation without sacrificing production log ingestion.
+
+**Alternatives considered:** JSON in every environment; reverting to Nest's default logger. JSON-only output reduced local readability, while reverting would discard the structured request context and centralized redaction behavior.
+
+**Consequence:** `pino-pretty` remains a development dependency. Logging tests must ensure the transport is enabled only in development and that redaction remains active independently of presentation.
+
+## 2026-09-24 — D012: Use a lazy node-postgres pool behind an explicit Nest database module
+
+**Decision:** Connect Drizzle through a node-postgres `Pool` owned by a non-global Nest `DatabaseModule`. Construct the pool during application composition, allow node-postgres to connect lazily on the first query, and close it through the Nest module lifecycle.
+
+**Why:** A managed pool provides clear resource ownership, supports transactions and direct readiness probes, and lets the application build and exercise dependency-independent liveness behavior when PostgreSQL is unavailable. Keeping the module non-global makes database dependencies visible in each consuming module.
+
+**Alternatives considered:** The postgres.js driver and a global database module. Both are supported approaches, but node-postgres gives an explicit pool suited to Nest lifecycle management, while global registration would hide module dependencies.
+
+**Consequence:** Modules that query PostgreSQL must import `DatabaseModule` and use `DatabaseService.client`. `DatabaseService.checkConnection()` is reserved for readiness checks. Schema generation and migrations remain explicit commands and must never run implicitly during application startup.
+
+## 2026-09-24 — D013: Keep Redis and BullMQ connections lazy during the foundation phase
+
+**Decision:** Own direct Redis access through a non-global queue infrastructure module and configure both ioredis and BullMQ for lazy connection. Register no queues or workers until a concrete outbox or reconciliation job exists.
+
+**Why:** M0 must establish the queue boundary without making dependency-independent startup or liveness require a running Redis service. Deferring queue registration also avoids inventing job contracts before their domain events exist.
+
+**Alternatives considered:** Connect Redis eagerly during startup or create placeholder queues and processors. Eager connection would couple liveness to Redis availability, while placeholders would add speculative behavior.
+
+**Consequence:** Consumers must explicitly import `QueueInfrastructureModule`. `RedisService.checkConnection()` is reserved for readiness checks. HTTP-facing producers use bounded retries; future long-running workers may require a separate BullMQ connection policy with `maxRetriesPerRequest: null`.
+
+## 2026-09-24 — D014: Standardize external errors at a global API boundary
+
+**Decision:** Convert thrown API exceptions into a shared error envelope containing a stable type, code, safe message, and request ID. Keep specialized successful or operational response contracts, such as readiness status, outside this general exception envelope.
+
+**Why:** A single boundary prevents framework defaults, stack traces, database messages, and other internal details from leaking while giving clients stable machine-readable failure information.
+
+**Alternatives considered:** Allow Nest's default error bodies or format errors separately in each controller. Defaults do not match the required contract, and controller-local formatting is inconsistent and easy to bypass.
+
+**Consequence:** New domain errors must pass through the global boundary and eventually map to explicit stable codes. Unexpected failures return a generic 500 message and are logged with request correlation without recording the original exception message.
+
+## 2026-09-24 — D015: Use native macOS services and exclude Docker
+
+**Decision:** Run PostgreSQL and Redis directly on macOS for local PayForge development. Do not add Dockerfiles, Docker Compose, or a container-based local workflow unless the user explicitly reverses this decision.
+
+**Why:** The user explicitly chose not to use Docker at all. PostgreSQL 17 is already installed locally, and Homebrew is available for Redis, so native services can satisfy the required persistence and queue behavior.
+
+**Alternatives considered:** Keep Docker deferred or use hosted development services. Deferral would leave M0 permanently open, while hosted services add network and account dependencies that are unnecessary for local development.
+
+**Consequence:** M0 verification uses native service commands and direct connectivity. Machine-level installation and service control remain user actions. Repository documentation and roadmap must not schedule Docker artifacts.

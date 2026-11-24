@@ -2,7 +2,7 @@
 
 Live list. Close an item only when resolution is verified. Preserve non-trivial history by moving resolved items to `Resolved` with the date and evidence.
 
-M0 scaffolding is not currently blocked. The items below affect later work and must be settled before their associated behavior is finalized.
+The application portion of M0 is complete. A002 tracks the native PostgreSQL/Redis service work needed to close M0. B001 and B002 affect later domain milestones.
 
 ## Open now
 
@@ -26,15 +26,17 @@ M0 scaffolding is not currently blocked. The items below affect later work and m
 
 ## Manual actions
 
-### A001 — Docker is unavailable and intentionally deferred
+### A002 — Native PostgreSQL and Redis services require local setup
 
-- **Affected work:** Docker Compose validation and containerized PostgreSQL/Redis development services later in M0.
-- **Current state:** The user confirmed on 2026-09-24 that the `docker` command is unavailable and chose to avoid Docker for now.
-- **Exact next action:** Continue workspace and application scaffolding. When containerized infrastructure is reached, the user can install/start Docker Desktop or explicitly choose a supported local/hosted PostgreSQL and Redis alternative.
-- **Resolution condition:** The selected dependency approach is available and its relevant connectivity/configuration checks pass.
+- **Affected work:** Live PostgreSQL/Redis connectivity, readiness verification, and M0 completion.
+- **Current state:** After the user restarted the existing PostgreSQL 17 launch daemon, `pg_isready` reported that `localhost:5432` accepts connections. The PayForge role/database are not yet verified. Redis is not installed. Homebrew 6.0.11 is available.
+- **Exact next action:** Create and verify the dedicated PayForge PostgreSQL role/database, install Redis with Homebrew, start Redis as a user service, then verify both direct clients before testing `/health/ready`.
+- **Resolution condition:** PostgreSQL accepts a connection using the local PayForge database credentials, `redis-cli ping` returns `PONG`, the API returns ready while both run, and returns unavailable when either dependency is deliberately stopped.
 
 Other potential needs such as deployment secrets, DNS/TLS, or an externally reachable webhook endpoint become manual actions only when the relevant work is attempted and the need is verified.
 
 ## Resolved
 
-None.
+### 2026-09-24 — A001: Docker unavailable and deferred
+
+The user explicitly decided that PayForge will not use Docker. D015 supersedes D008 and removes Docker Compose from M0. Native macOS PostgreSQL and Redis services replace the containerized development approach.

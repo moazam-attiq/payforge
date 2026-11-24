@@ -3,7 +3,17 @@
   "version": "0.1.0",
   "private": true,
   "description": "A security-conscious sandbox payment-processing platform for learning payment architecture.",
-  "scripts": {},
+  "scripts": {
+    "build": "pnpm -r --if-present run build",
+    "dev:api": "pnpm --filter @payforge/api start:dev",
+    "dev:dashboard": "pnpm --filter @payforge/dashboard dev",
+    "typecheck": "pnpm -r --if-present run typecheck",
+    "lint": "pnpm -r --if-present run lint",
+    "test": "pnpm -r --if-present run test",
+    "test:e2e": "pnpm -r --if-present run test:e2e",
+    "format:check": "pnpm -r --if-present run format:check",
+    "format": "pnpm -r --if-present run format"
+  },
   "engines": {
     "node": ">=22"
   },

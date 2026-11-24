@@ -2,9 +2,9 @@
 
 ## Project summary
 
-PayForge is a planned developer-facing sandbox payment platform. It teaches payment lifecycle, accounting, idempotency, event delivery, privacy, and operational-failure patterns using synthetic test instruments only. It must never accept real card/bank data or move real funds.
+PayForge is a developer-facing sandbox payment platform under active construction. It teaches payment lifecycle, accounting, idempotency, event delivery, privacy, and operational-failure patterns using synthetic test instruments only. It must never accept real card/bank data or move real funds.
 
-The authoritative scope is the user-supplied engineering blueprint summarized in `PROJECT.md`. The repository had no application files or Git metadata when `.ai/` was initialized on 2026-09-24. Do not mistake the detailed target design for implemented behavior.
+The authoritative scope is the user-supplied engineering blueprint summarized in `PROJECT.md`. The repository was empty when `.ai/` was initialized on 2026-09-24, but it now contains the verified M0 application foundation described in `PROGRESS.md`. Do not mistake empty domain-module scaffolding or the detailed target design for implemented product behavior.
 
 ## How to determine current state
 
@@ -21,7 +21,7 @@ Then inspect current repository state and Git history, if Git has since been ini
 
 ## Current milestone
 
-The active milestone is identified in both the bottom of `ROADMAP.md` and the heading of `TASKS.md`; they must match. At initialization, the active milestone is **M0 — Foundation**. Its application work has not started. The `.ai/` initialization session does not count as implementation of M0.
+The active milestone is identified in both the bottom of `ROADMAP.md` and the heading of `TASKS.md`; they must match. The active milestone is **M0 — Foundation**. The application foundation is implemented and locally verified. M0 remains active while native PostgreSQL/Redis services and live readiness are completed under D015/A002. Docker is excluded. Do not begin M1 until M0 is completed or the user explicitly changes the milestone plan.
 
 ## Session continuation rules
 
@@ -38,7 +38,7 @@ The active milestone is identified in both the bottom of `ROADMAP.md` and the he
 
 ## Important project conventions
 
-These conventions come from the authoritative blueprint. They are required target conventions even though the application is not yet implemented.
+These conventions come from the authoritative blueprint. Foundation-level enforcement exists where recorded in `PROGRESS.md`; later domain behavior remains target state.
 
 ### Domain and repository boundaries
 
